@@ -20,8 +20,11 @@ type_app = typer.Typer(help="Gestion de tipos repetitivos (daily, task, mrreview
 app.add_typer(type_app, name="type")
 
 
+SOFT_RED = (224, 108, 117)  # legible sobre fondos oscuros (Darcula, One Dark, etc.)
+
+
 def _fail(message: str) -> None:
-    typer.echo(message, err=True)
+    typer.secho(message, fg=SOFT_RED, err=True)
     raise typer.Exit(code=1)
 
 

@@ -97,8 +97,10 @@ def show_active() -> date:
     return storage.get_active_date()
 
 
-def list_entries(date_str: str | None) -> tuple[date, list[dict]]:
-    target_date = validation.validate_date(date_str) if date_str else storage.get_active_date()
+def list_entries(dia: int | None, date_str: str | None) -> tuple[date, list[dict]]:
+    if dia is not None and date_str is not None:
+        raise ValueError("--dia y --date son mutuamente excluyentes, usa uno solo.")
+    target_date = validation.resolve_date(dia, date_str, storage.get_active_date())
     return target_date, storage.load_entries(target_date)
 
 

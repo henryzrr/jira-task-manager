@@ -142,11 +142,12 @@ def type_rm_cmd(name: str = typer.Argument(..., help="Nombre del tipo a borrar")
 
 @app.command(name="list")
 def list_cmd(
-    date: Optional[str] = typer.Option(None, "--date", help="Fecha a listar (default: dia activo)"),
+    dia: Optional[int] = typer.Option(None, "--dia", help="Dia del mes actual (1-31)"),
+    date: Optional[str] = typer.Option(None, "--date", help="Fecha completa YYYY-MM-DD"),
 ) -> None:
-    """Lista las entries de un dia, marcando pusheado/pendiente."""
+    """Lista las entries de un dia, marcando pusheado/pendiente (default: dia activo)."""
     try:
-        target_date, entries = commands.list_entries(date)
+        target_date, entries = commands.list_entries(dia, date)
     except ValueError as exc:
         _fail(str(exc))
         return

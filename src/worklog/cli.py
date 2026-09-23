@@ -254,11 +254,12 @@ def export_cmd(
 
 @app.command(name="push")
 def push_cmd(
-    date: Optional[str] = typer.Option(None, "--date", help="Fecha a pushear (default: dia activo)"),
+    dia: Optional[int] = typer.Option(None, "--dia", help="Dia del mes actual (1-31)"),
+    date: Optional[str] = typer.Option(None, "--date", help="Fecha completa YYYY-MM-DD"),
 ) -> None:
-    """Sube a Jira las entries pendientes de un dia."""
+    """Sube a Jira las entries pendientes de un dia (default: dia activo)."""
     try:
-        target_date, results = commands.push(date)
+        target_date, results = commands.push(dia, date)
     except ValueError as exc:
         _fail(str(exc))
         return

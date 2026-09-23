@@ -182,8 +182,10 @@ def export_range(date_from: str, date_to: str) -> list[dict]:
     return result
 
 
-def push(date_str: str | None) -> tuple[date, list]:
-    target_date = validation.validate_date(date_str) if date_str else storage.get_active_date()
+def push(dia: int | None, date_str: str | None) -> tuple[date, list]:
+    if dia is not None and date_str is not None:
+        raise ValueError("--dia y --date son mutuamente excluyentes, usa uno solo.")
+    target_date = validation.resolve_date(dia, date_str, storage.get_active_date())
     entries = storage.load_entries(target_date)
     pending = [e for e in entries if not e["pushed"]]
 

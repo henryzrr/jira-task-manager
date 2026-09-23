@@ -167,6 +167,9 @@ def list_cmd(
         typer.echo(f"  comment: {e['comment']}")
         typer.echo(f"  estado:  {status}")
 
+    total = sum(e["duration_seconds"] for e in entries)
+    typer.echo(f"\nTotal registrado: {_seconds_to_human(total)}")
+
 
 @app.command(name="gap")
 def gap_cmd() -> None:

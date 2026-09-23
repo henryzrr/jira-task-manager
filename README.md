@@ -118,6 +118,7 @@ worklog list                                     # entries del dia activo
 worklog list --date 2026-09-14                   # entries de un dia puntual
 worklog gap                                      # horas sin registrar hoy (8h - cargado)
 worklog rm <entry_id>                            # borra una entry mal cargada, antes de pushear
+worklog edit <entry_id> --dur 2h --comment "..." # edita solo los campos pasados, antes de pushear
 worklog sum --from 2026-09-01 --to 2026-09-18
 worklog export --from 2026-09-01 --to 2026-09-18 --out export.json
 

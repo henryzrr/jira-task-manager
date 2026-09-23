@@ -119,6 +119,42 @@ def rm_entry(entry_id: str, date_str: str | None) -> date:
     return target_date
 
 
+def edit_entry(
+    entry_id: str,
+    date_str: str | None,
+    *,
+    dur: str | None,
+    ticket: str | None,
+    comment: str | None,
+    init: str | None,
+) -> tuple[date, dict]:
+    target_date = validation.validate_date(date_str) if date_str else storage.get_active_date()
+    entry = storage.get_entry(target_date, entry_id)
+    if entry is None:
+        raise ValueError(f"No existe ninguna entry con id {entry_id!r} en {target_date.isoformat()}.")
+    if entry["pushed"]:
+        raise ValueError(
+            f"La entry {entry_id!r} ya fue pusheada a Jira (worklog {entry['jira_worklog_id']}) "
+            "-- no se puede editar. Borra el worklog en Jira y volve a cargarla si te equivocaste."
+        )
+
+    updates: dict = {}
+    if ticket is not None:
+        updates["ticket"] = validation.validate_ticket(ticket)
+    if comment is not None:
+        updates["comment"] = comment
+    if init is not None:
+        updates["init"] = validation.validate_init(init)
+    if dur is not None:
+        updates["duration_seconds"] = validation.parse_duration(dur)
+        updates["duration_raw"] = dur
+    if not updates:
+        raise ValueError("No pasaste ningun campo para editar (--dur/--ticket/--comment/--init).")
+
+    updated = storage.update_entry(target_date, entry_id, updates)
+    return target_date, updated
+
+
 def _date_range(date_from: str, date_to: str) -> list[date]:
     start = validation.validate_date(date_from)
     end = validation.validate_date(date_to)

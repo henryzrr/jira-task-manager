@@ -101,6 +101,23 @@ def add_entry(target_date: date, type_name: str, resolved: dict) -> dict:
     return entry
 
 
+def get_entry(target_date: date, entry_id: str) -> dict | None:
+    for entry in load_entries(target_date):
+        if entry["id"] == entry_id:
+            return entry
+    return None
+
+
+def update_entry(target_date: date, entry_id: str, updates: dict) -> dict | None:
+    entries = load_entries(target_date)
+    for entry in entries:
+        if entry["id"] == entry_id:
+            entry.update(updates)
+            save_entries(target_date, entries)
+            return entry
+    return None
+
+
 def remove_entry(target_date: date, entry_id: str) -> bool:
     entries = load_entries(target_date)
     remaining = [e for e in entries if e["id"] != entry_id]

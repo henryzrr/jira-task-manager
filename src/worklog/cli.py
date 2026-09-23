@@ -193,6 +193,30 @@ def rm_cmd(
     typer.secho(f"Entry {entry_id} borrada de {target_date.isoformat()}.", fg=typer.colors.GREEN)
 
 
+@app.command(name="edit")
+def edit_cmd(
+    entry_id: str = typer.Argument(..., help="Id de la entry a editar"),
+    date: Optional[str] = typer.Option(None, "--date", help="Fecha de la entry (default: dia activo)"),
+    dur: Optional[str] = typer.Option(None, "--dur", help="Nueva duracion, ej: 1h35m"),
+    ticket: Optional[str] = typer.Option(None, "--ticket", help="Nuevo ticket Jira"),
+    comment: Optional[str] = typer.Option(None, "--comment", help="Nuevo comentario"),
+    init: Optional[str] = typer.Option(None, "--init", help="Nueva hora de inicio HH:MM"),
+) -> None:
+    """Edita una entry sin pushear (pasa solo los campos que queres cambiar)."""
+    try:
+        target_date, entry = commands.edit_entry(
+            entry_id, date, dur=dur, ticket=ticket, comment=comment, init=init
+        )
+    except ValueError as exc:
+        _fail(str(exc))
+        return
+    typer.secho(
+        f"Entry {entry_id} actualizada en {target_date.isoformat()}: "
+        f"{entry['duration_raw']} {entry['ticket']} @ {entry['init']} -- {entry['comment']!r}",
+        fg=typer.colors.GREEN,
+    )
+
+
 @app.command(name="sum")
 def sum_cmd(
     date_from: str = typer.Option(..., "--from", help="Fecha inicio YYYY-MM-DD"),

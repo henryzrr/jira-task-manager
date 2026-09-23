@@ -9,6 +9,12 @@ from worklog.jira_push import JiraConfigError, push_entry
 
 WORKDAY_SECONDS = 8 * 3600
 
+# Bucket ad-hoc: siempre disponible, no requiere 'type set' previo. Si el
+# usuario SI corre 'type set task ...', esos defaults se usan igual (queda
+# en config.json como cualquier otro tipo) -- esto solo cubre el caso en
+# que todavia no fue configurado.
+BUILTIN_ADHOC_TYPE = "task"
+
 
 def type_list() -> dict:
     return storage.load_config()
@@ -62,14 +68,18 @@ def record(
 
     config = storage.load_config()
     if type_name not in config:
-        raise ValueError(
-            f"Tipo {type_name!r} no configurado. Usar 'worklog type set {type_name} ...' primero."
-        )
+        if type_name != BUILTIN_ADHOC_TYPE:
+            raise ValueError(
+                f"Tipo {type_name!r} no configurado. Usar 'worklog type set {type_name} ...' primero."
+            )
+        type_config = {}
+    else:
+        type_config = config[type_name]
 
     active_date = storage.get_active_date()
     target_date = validation.resolve_date(dia, date_str, active_date)
     resolved = validation.resolve_entry_fields(
-        config[type_name], dur=dur, ticket=ticket, comment=comment, init=init
+        type_config, dur=dur, ticket=ticket, comment=comment, init=init
     )
     return storage.add_entry(target_date, type_name, resolved)
 

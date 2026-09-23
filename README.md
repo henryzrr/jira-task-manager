@@ -83,18 +83,27 @@ reinstalar:
 Se crea solo, la primera vez que corres algo que necesite escribir ahi
 (`worklog type set` o `worklog <tipo>`).
 
+## Tipos: `task` vs tipos con defaults
+
+- **`task`** — bucket generico ad-hoc, **siempre disponible**, sin `type set`
+  previo. Como no tiene defaults, exige `--dur --ticket --comment --init`
+  completos en cada carga.
+- **Cualquier otro nombre** (`daily`, `mrreviewer`, el que definas) — necesita
+  `worklog type set <nombre> --init HH:MM [...]` una vez, para guardar los
+  defaults que despues te ahorran retipear.
+
 ## Uso rapido
 
 ```bash
 # 1. definir tipos repetitivos (--init siempre obligatorio, resto opcional)
+#    "task" es la unica excepcion: existe siempre, no hace falta configurarlo.
 worklog type set daily --init 09:50 --ticket I2W-100 --comment "Daily sprint planning" --dur 15m
-worklog type set task --init 09:00              # bucket generico, sin defaults fijos
 worklog type list                                # ver que hay configurado
-worklog type rm task                             # borrar un tipo
+worklog type rm daily                            # borrar un tipo
 
 # 2. cargar horas (el tipo es un subcomando, no un flag)
 worklog daily                                    # usa todos los defaults del tipo
-worklog task --dur 5h --dia 7 --ticket I2W-33 --comment "se trabajo en..."
+worklog task --dur 5h --dia 7 --ticket I2W-33 --comment "se trabajo en..."  # sin setup previo
 worklog daily --dur 20m --ticket I2W-444         # override puntual de un default
 
 # 3. dia activo (todo lo que cargues despues apunta ahi, sin repetir --dia/--date)

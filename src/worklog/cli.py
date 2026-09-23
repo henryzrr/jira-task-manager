@@ -65,12 +65,16 @@ def _make_type_command(type_name: str):
             fg=typer.colors.GREEN,
         )
 
-    handler.__doc__ = f"Registrar horas de tipo '{type_name}'."
+    if type_name == commands.BUILTIN_ADHOC_TYPE:
+        handler.__doc__ = "Registrar horas ad-hoc (bucket generico, sin defaults salvo que lo configures con 'type set')."
+    else:
+        handler.__doc__ = f"Registrar horas de tipo '{type_name}'."
     return handler
 
 
 def _register_dynamic_type_commands() -> None:
-    for type_name in storage.load_config():
+    type_names = set(storage.load_config()) | {commands.BUILTIN_ADHOC_TYPE}
+    for type_name in sorted(type_names):
         app.command(name=type_name)(_make_type_command(type_name))
 
 

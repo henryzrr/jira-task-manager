@@ -156,11 +156,16 @@ def list_cmd(
         return
     typer.echo(f"Entries de {target_date.isoformat()}:")
     for e in entries:
-        status = "pusheado" if e["pushed"] else "pendiente"
-        typer.echo(
-            f"  [{e['id']}] {e['type']} {e['duration_raw']} {e['ticket']} "
-            f"@ {e['init']} -- {status}"
-        )
+        if e["pushed"]:
+            status = f"pusheado (worklog {e['jira_worklog_id']})"
+        else:
+            status = "pendiente"
+        typer.echo(f"\n[{e['id']}] {e['type']}")
+        typer.echo(f"  ticket:  {e['ticket']}")
+        typer.echo(f"  dur:     {e['duration_raw']}")
+        typer.echo(f"  init:    {e['init']}")
+        typer.echo(f"  comment: {e['comment']}")
+        typer.echo(f"  estado:  {status}")
 
 
 @app.command(name="gap")

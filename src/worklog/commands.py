@@ -27,9 +27,9 @@ def type_set(
     comment: str | None = None,
     dur: str | None = None,
 ) -> dict:
-    validation.validate_init(init)
+    init = validation.validate_init(init)
     if ticket is not None:
-        validation.validate_ticket(ticket)
+        ticket = validation.validate_ticket(ticket)
     if dur is not None:
         validation.parse_duration(dur)
 

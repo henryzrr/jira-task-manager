@@ -13,7 +13,7 @@ from datetime import date, datetime
 
 DUR_RE = re.compile(r"^(?:(\d+)h)?(?:(\d+)m)?$")
 TICKET_RE = re.compile(r"^[A-Z][A-Z0-9]*-\d+$")
-INIT_RE = re.compile(r"^([01]\d|2[0-3]):([0-5]\d)$")
+INIT_RE = re.compile(r"^([01]?\d|2[0-3]):([0-5]\d)$")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 
 
@@ -41,9 +41,11 @@ def validate_ticket(ticket: str) -> str:
 
 def validate_init(init: str) -> str:
     init = init.strip()
-    if not INIT_RE.match(init):
+    match = INIT_RE.match(init)
+    if not match:
         raise ValueError(f"--init invalido: {init!r}. Formato esperado: 'HH:MM' (24hs).")
-    return init
+    hour, minute = match.groups()
+    return f"{int(hour):02d}:{minute}"
 
 
 def resolve_date(dia: int | None, date_str: str | None, active_date: date) -> date:
@@ -116,8 +118,8 @@ def resolve_entry_fields(
             + ", ".join(f"--{name}" for name in missing)
         )
 
-    validate_ticket(resolved_ticket)
-    validate_init(resolved_init)
+    resolved_ticket = validate_ticket(resolved_ticket)
+    resolved_init = validate_init(resolved_init)
     duration_seconds = parse_duration(resolved_dur)
 
     return {

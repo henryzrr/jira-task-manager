@@ -21,7 +21,7 @@ app.add_typer(type_app, name="type")
 
 
 def _fail(message: str) -> None:
-    typer.secho(message, fg=typer.colors.RED, err=True)
+    typer.echo(message, err=True)
     raise typer.Exit(code=1)
 
 

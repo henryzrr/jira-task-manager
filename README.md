@@ -140,9 +140,12 @@ tipo (`ticket`, `comment`, `dur`, `init`) combinando default + override; si
 falta alguno, el CLI **no guarda nada** — imprime el error y listo
 (operacion atomica, todo o nada).
 
-`--init` nunca cae a "la hora actual del sistema": si el tipo no tiene un
-`init` default y no pasaste `--init` en la carga, es error explicito
-(evita horas erroneas al backfillear un dia pasado).
+`--init` tiene un unico fallback automatico: si falta (sin default de tipo
+ni override) **y la carga es para HOY**, se infiere como "hora actual menos
+la duracion" (asumiendo que recien terminaste la tarea). Para cualquier
+otro dia (`--dia`/`--date` de backfill) sigue sin fallback — ahi es error
+explicito, porque usar la hora actual del sistema para un dia pasado da
+horas incorrectas.
 
 ## Jira (push)
 

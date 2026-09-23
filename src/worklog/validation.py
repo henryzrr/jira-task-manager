@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import calendar
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 DUR_RE = re.compile(r"^(?:(\d+)h)?(?:(\d+)m)?$")
 TICKET_RE = re.compile(r"^[A-Z][A-Z0-9]*-\d+$")
@@ -89,11 +89,18 @@ def resolve_entry_fields(
     ticket: str | None,
     comment: str | None,
     init: str | None,
+    target_date: date,
 ) -> dict:
     """Combina defaults del tipo con overrides de la carga.
 
-    Cada campo (ticket, comment, dur, init) debe terminar con un valor real.
-    Si alguno queda sin resolver, levanta ValueError -- el entry NO se genera.
+    ticket/comment/dur deben terminar con un valor real (default del tipo u
+    override) o no se genera el registro. init tiene una excepcion: si falta
+    Y la carga es para HOY (no un --dia/--date de backfill), se infiere como
+    "hora actual menos la duracion" -- asume que recien terminaste la tarea.
+    Para cualquier otro dia sigue sin fallback (ver 'Why' en el diseño: usar
+    la hora actual del sistema para backfillear un dia pasado da horas
+    incorrectas).
+
     Guarda `is None` explicito, nunca truthiness (un default "0h0m" ya fue
     rechazado en parse_duration, no hay falsy valido que confundir aca).
     """
@@ -108,7 +115,6 @@ def resolve_entry_fields(
             ("ticket", resolved_ticket),
             ("comment", resolved_comment),
             ("dur", resolved_dur),
-            ("init", resolved_init),
         )
         if value is None
     ]
@@ -119,8 +125,18 @@ def resolve_entry_fields(
         )
 
     resolved_ticket = validate_ticket(resolved_ticket)
-    resolved_init = validate_init(resolved_init)
     duration_seconds = parse_duration(resolved_dur)
+
+    if resolved_init is None:
+        if target_date != date.today():
+            raise ValueError(
+                "Falta --init (el tipo no tiene default, y no se puede inferir "
+                "porque no es el dia de hoy -- necesita hora explicita)."
+            )
+        start = datetime.now() - timedelta(seconds=duration_seconds)
+        resolved_init = start.strftime("%H:%M")
+    else:
+        resolved_init = validate_init(resolved_init)
 
     return {
         "ticket": resolved_ticket,

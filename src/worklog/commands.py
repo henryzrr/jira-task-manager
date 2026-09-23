@@ -80,7 +80,7 @@ def record(
     active_date = storage.get_active_date()
     target_date = validation.resolve_date(dia, date_str, active_date)
     resolved = validation.resolve_entry_fields(
-        type_config, dur=dur, ticket=ticket, comment=comment, init=init
+        type_config, dur=dur, ticket=ticket, comment=comment, init=init, target_date=target_date
     )
     return storage.add_entry(target_date, type_name, resolved)
 

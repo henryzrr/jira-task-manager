@@ -22,12 +22,13 @@ def type_list() -> dict:
 
 def type_set(
     name: str,
-    init: str,
+    init: str | None = None,
     ticket: str | None = None,
     comment: str | None = None,
     dur: str | None = None,
 ) -> dict:
-    init = validation.validate_init(init)
+    if init is not None:
+        init = validation.validate_init(init)
     if ticket is not None:
         ticket = validation.validate_ticket(ticket)
     if dur is not None:
@@ -38,7 +39,7 @@ def type_set(
     config[name] = {
         "ticket": ticket if ticket is not None else existing.get("ticket"),
         "comment": comment if comment is not None else existing.get("comment"),
-        "init": init,
+        "init": init if init is not None else existing.get("init"),
         "dur": dur if dur is not None else existing.get("dur"),
     }
     storage.save_config(config)

@@ -89,13 +89,15 @@ Se crea solo, la primera vez que corres algo que necesite escribir ahi
   previo. Como no tiene defaults, exige `--dur --ticket --comment --init`
   completos en cada carga.
 - **Cualquier otro nombre** (`daily`, `mrreviewer`, el que definas) — necesita
-  `worklog type set <nombre> --init HH:MM [...]` una vez, para guardar los
-  defaults que despues te ahorran retipear.
+  `worklog type set <nombre> [--init HH:MM] [...]` una vez, para guardar los
+  defaults que despues te ahorran retipear. Todos los campos son opcionales
+  en `type set`; lo que no definas ahi lo vas a tener que pasar a mano en
+  cada carga (o falla explicito si falta).
 
 ## Uso rapido
 
 ```bash
-# 1. definir tipos repetitivos (--init siempre obligatorio, resto opcional)
+# 1. definir tipos repetitivos (todos los campos son opcionales)
 #    "task" es la unica excepcion: existe siempre, no hace falta configurarlo.
 worklog type set daily --init 09:50 --ticket I2W-100 --comment "Daily sprint planning" --dur 15m
 worklog type list                                # ver que hay configurado
@@ -137,10 +139,9 @@ tipo (`ticket`, `comment`, `dur`, `init`) combinando default + override; si
 falta alguno, el CLI **no guarda nada** — imprime el error y listo
 (operacion atomica, todo o nada).
 
-`--init` nunca cae a "la hora actual del sistema": `type set` exige
-`--init` siempre, asi que si el tipo no lo tiene y no pasaste `--init` en
-la carga, es error explicito (evita horas erroneas al backfillear un dia
-pasado).
+`--init` nunca cae a "la hora actual del sistema": si el tipo no tiene un
+`init` default y no pasaste `--init` en la carga, es error explicito
+(evita horas erroneas al backfillear un dia pasado).
 
 ## Jira (push)
 

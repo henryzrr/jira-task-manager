@@ -115,12 +115,12 @@ def type_list_cmd() -> None:
 @type_app.command(name="set")
 def type_set_cmd(
     name: str = typer.Argument(..., help="Nombre del tipo, ej: daily, task"),
-    init: str = typer.Option(..., "--init", help="Hora de inicio HH:MM (obligatorio)"),
+    init: Optional[str] = typer.Option(None, "--init", help="Hora de inicio HH:MM default"),
     ticket: Optional[str] = typer.Option(None, "--ticket", help="Ticket Jira default"),
     comment: Optional[str] = typer.Option(None, "--comment", help="Comentario default"),
     dur: Optional[str] = typer.Option(None, "--dur", help="Duracion default, ej: 15m"),
 ) -> None:
-    """Crea o actualiza un tipo repetitivo. --init es siempre obligatorio."""
+    """Crea o actualiza un tipo repetitivo. Todos los campos son opcionales."""
     try:
         cfg = commands.type_set(name, init, ticket=ticket, comment=comment, dur=dur)
     except ValueError as exc:

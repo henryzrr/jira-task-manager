@@ -69,6 +69,17 @@ def _started_timestamp(entry_date: date, init: str) -> str:
     return dt.strftime("%Y-%m-%dT%H:%M:%S.000") + offset
 
 
+def _comment_adf(text: str) -> dict:
+    """La API v3 exige el comment en Atlassian Document Format, no texto
+    plano -- un string ahi invalida el body entero (400, "worklog no puede
+    ser nulo"), no solo el campo comment."""
+    return {
+        "type": "doc",
+        "version": 1,
+        "content": [{"type": "paragraph", "content": [{"type": "text", "text": text}]}],
+    }
+
+
 def push_entry(entry: dict) -> JiraPushResult:
     """Sube una entry a Jira. No levanta excepcion por fallas de Jira (red,
     404, permisos) -- eso se reporta en el resultado para que el caller
@@ -84,7 +95,7 @@ def push_entry(entry: dict) -> JiraPushResult:
         {
             "started": started,
             "timeSpentSeconds": entry["duration_seconds"],
-            "comment": entry["comment"],
+            "comment": _comment_adf(entry["comment"]),
         }
     ).encode("utf-8")
 

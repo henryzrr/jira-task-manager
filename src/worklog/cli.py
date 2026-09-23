@@ -182,11 +182,12 @@ def gap_cmd() -> None:
 @app.command(name="rm")
 def rm_cmd(
     entry_id: str = typer.Argument(..., help="Id de la entry a borrar"),
-    date: Optional[str] = typer.Option(None, "--date", help="Fecha de la entry (default: dia activo)"),
+    dia: Optional[int] = typer.Option(None, "--dia", help="Dia del mes actual (1-31)"),
+    date: Optional[str] = typer.Option(None, "--date", help="Fecha completa YYYY-MM-DD"),
 ) -> None:
-    """Borra una entry antes de pushearla."""
+    """Borra una entry antes de pushearla (default: dia activo)."""
     try:
-        target_date = commands.rm_entry(entry_id, date)
+        target_date = commands.rm_entry(entry_id, dia, date)
     except ValueError as exc:
         _fail(str(exc))
         return
@@ -196,16 +197,17 @@ def rm_cmd(
 @app.command(name="edit")
 def edit_cmd(
     entry_id: str = typer.Argument(..., help="Id de la entry a editar"),
-    date: Optional[str] = typer.Option(None, "--date", help="Fecha de la entry (default: dia activo)"),
+    dia: Optional[int] = typer.Option(None, "--dia", help="Dia del mes actual (1-31)"),
+    date: Optional[str] = typer.Option(None, "--date", help="Fecha completa YYYY-MM-DD"),
     dur: Optional[str] = typer.Option(None, "--dur", help="Nueva duracion, ej: 1h35m"),
     ticket: Optional[str] = typer.Option(None, "--ticket", help="Nuevo ticket Jira"),
     comment: Optional[str] = typer.Option(None, "--comment", help="Nuevo comentario"),
     init: Optional[str] = typer.Option(None, "--init", help="Nueva hora de inicio HH:MM"),
 ) -> None:
-    """Edita una entry sin pushear (pasa solo los campos que queres cambiar)."""
+    """Edita una entry sin pushear (default: dia activo; pasa solo los campos que cambias)."""
     try:
         target_date, entry = commands.edit_entry(
-            entry_id, date, dur=dur, ticket=ticket, comment=comment, init=init
+            entry_id, dia, date, dur=dur, ticket=ticket, comment=comment, init=init
         )
     except ValueError as exc:
         _fail(str(exc))

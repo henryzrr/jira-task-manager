@@ -112,8 +112,10 @@ def gap() -> tuple[date, int]:
     return target_date, WORKDAY_SECONDS - total
 
 
-def rm_entry(entry_id: str, date_str: str | None) -> date:
-    target_date = validation.validate_date(date_str) if date_str else storage.get_active_date()
+def rm_entry(entry_id: str, dia: int | None, date_str: str | None) -> date:
+    if dia is not None and date_str is not None:
+        raise ValueError("--dia y --date son mutuamente excluyentes, usa uno solo.")
+    target_date = validation.resolve_date(dia, date_str, storage.get_active_date())
     if not storage.remove_entry(target_date, entry_id):
         raise ValueError(f"No existe ninguna entry con id {entry_id!r} en {target_date.isoformat()}.")
     return target_date
@@ -121,6 +123,7 @@ def rm_entry(entry_id: str, date_str: str | None) -> date:
 
 def edit_entry(
     entry_id: str,
+    dia: int | None,
     date_str: str | None,
     *,
     dur: str | None,
@@ -128,7 +131,9 @@ def edit_entry(
     comment: str | None,
     init: str | None,
 ) -> tuple[date, dict]:
-    target_date = validation.validate_date(date_str) if date_str else storage.get_active_date()
+    if dia is not None and date_str is not None:
+        raise ValueError("--dia y --date son mutuamente excluyentes, usa uno solo.")
+    target_date = validation.resolve_date(dia, date_str, storage.get_active_date())
     entry = storage.get_entry(target_date, entry_id)
     if entry is None:
         raise ValueError(f"No existe ninguna entry con id {entry_id!r} en {target_date.isoformat()}.")
